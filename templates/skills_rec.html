@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Recommendations, Udemy Courses, and edX Courses</title>
+  <!-- Bootstrap Icons CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    /* Base styles for containers */
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2em;
+      padding: 1em;
+    }
+
+    .card-section {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2em;
+      justify-content: center;
+      margin-bottom: 2em; /* Space between sections and logos */
+    }
+
+    .udemy-card, .course-card, .edx-card {
+      width: calc(33.333% - 2em);
+      height: auto;
+      border-radius: 1em;
+      border: 0.4em solid black;
+      box-shadow: 0.3em 0.3em black;
+      padding: 1em;
+      transition: all 0.3s ease-in-out;
+      box-sizing: border-box;
+    }
+
+    /* Hover effects for all cards */
+    .udemy-card:hover, .course-card:hover, .edx-card:hover {
+      box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.5);
+      transform: scale(1.05);
+    }
+
+    .udemy-card:hover .Name-9999,
+    .course-card:hover .course-title,
+    .edx-card:hover .course-title,
+    .udemy-card:hover .Price-9999,
+    .edx-card:hover .price {
+      color: #004080;
+      transform: translateY(-5px);
+    }
+
+    .udemy-card:hover .svg-icon path,
+    .course-card:hover .svg-icon path,
+    .edx-card:hover .svg-icon path {
+      fill: #004080;
+      transform: scale(1.2);
+    }
+
+    /* Specific styles for Udemy courses */
+    .Name-9999, .Price-9999, .Description-9999, .YouGet-9999 {
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 900;
+      transition: all 0.3s ease;
+    }
+
+    .Name-9999 {
+      font-size: 1.8em;
+      margin-left: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .Price-9999 {
+      margin-bottom: 0.3em;
+      margin-top: -0.3em;
+      font-size: 2em;
+      margin-left: 0.3em;
+    }
+
+    .Description-9999, .YouGet-9999 {
+      font-size: 1.1em;
+      margin-left: 2.5em;
+      margin-top: -1.4em;
+    }
+
+    .course-title {
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      font-weight: 900;
+      font-size: 1.8em;
+      margin-left: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .course-details, .edx-course-details {
+      margin-left: 2.5em;
+      margin-top: 1em;
+    }
+
+    .course-details p, .edx-course-details p {
+      font-size: 1em;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5em;
+      transition: color 0.3s ease;
+    }
+
+    .course-details p i, .edx-course-details p i {
+      margin-right: 0.5em;
+    }
+
+    .course-details a, .edx-course-details a {
+      color: #006400;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .course-details a:hover, .edx-course-details a:hover {
+      text-decoration: underline;
+    }
+
+    /* Specific styles for edX courses */
+    .price {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      margin-top: 1em;
+    }
+
+    .skill-box {
+      padding: 0.5em 1em;
+      background-color: #E0FFFF;
+      border-radius: 1em;
+      font-size: 0.8em;
+      font-weight: 900;
+      text-align: center;
+      box-shadow: 0.2em 0.2em rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .skill-box:hover {
+      transform: scale(1.1);
+      background-color: #FFDAB9;
+    }
+
+    .logo {
+      width: 100px; /* Adjust size as needed */
+      height: auto;
+      margin: 2em 0; /* Space around the logo */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+        <img src="../static/assets/images/udemy.png" alt="Logo" class="logo">
+
+    <!-- Udemy Courses Section -->
+    <div class="card-section">
+      {% for skill in skills %}
+        <div class="udemy-card" id="card-{{ loop.index }}">
+          <div>
+            <p class="Name-9999">{{ skill['title'] }}</p>
+            <p style="margin-left:15px;">{{ skill['description'] }}</p>
+          </div>
+          <div class="course-details">
+            <p><i class="bi bi-person-fill"></i> {{ skill['instructor'] }}</p>
+            <p><i class="bi bi-star-fill"></i> {{ skill['rating'] }}</p>
+            <p><i class="bi bi-chat-fill"></i>{{ skill['reviewcount'] }}</p>
+            <p><i class="bi bi-clock-fill"></i> {{ skill['duration'] }}</p>
+            <p><i class="bi bi-play-circle-fill"></i> {{ skill['lectures'] }}</p>
+            <p><i class="bi bi-bar-chart-fill"></i> {{ skill['level'] }}</p>
+            <p><i class="bi bi-link-45deg"></i> <a href="{{ skill['url'] }}">Course URL</a></p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Logo Between Sections -->
+    <img src="../static/assets/images/coursera.png" alt="Logo" class="logo">
+
+    <!-- Course Recommendations Section -->
+    <div class="card-section">
+      {% for course in courses %}
+        <div class="course-card">
+          <div>
+            <p class="course-title">{{ course['course'] }}</p>
+            <p class="partner">Partner: {{ course['partner'] }}</p>
+          </div>
+          <div class="course-details">
+            <p><i class="bi bi-star-fill"></i> Rating: {{ course['rating'] }}</p>
+            <p><i class="bi bi-chat-fill"></i> Reviews: {{ course['reviewcount'] }}</p>
+            <p><i class="bi bi-bar-chart-fill"></i> Level: {{ course['level'] }}</p>
+            <p><i class="bi bi-award-fill"></i> Certificate: {{ course['certificatetype'] }}</p>
+            <p><i class="bi bi-clock-fill"></i> Duration: {{ course['duration'] }}</p>
+            <p><i class="bi bi-link-45deg"></i> <a href="{{ course['url'] }}">Course URL</a></p>
+          </div>
+          <div>
+            <p>Skills:</p>
+            <div class="skills-container">
+              {% set skills = course['skills']|replace('{"', '')|replace('"}', '') %}
+              {% for skill in skills.split('","')[:5] %}
+                <div class="skill-box">{{ skill }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Logo Between Sections -->
+    <img src="../static/assets/images/edx.png" alt="Logo" class="logo">
+
+    <!-- edX Courses Section -->
+    <div class="card-section">
+      {% for edx_course in edx_courses %}
+        <div class="edx-card">
+          <div>
+            <p class="course-title">{{ edx_course['title'] }}</p>
+            <p>{{ edx_course['summary'] }}</p>
+          </div>
+          <div class="edx-course-details">
+            <p><i class="bi bi-person-fill"></i> {{ edx_course['instructors'] }}</p>
+            <p><i class="bi bi-bar-chart-fill"></i> Level: {{ edx_course['Level'] }}</p>
+            <p><i class="bi bi-calendar-fill"></i> Effort: {{ edx_course['course_effort'] }}</p>
+            <p><i class="bi bi-calendar-check-fill"></i> Length: {{ edx_course['course_length'] }}</p>
+            <p><i class="bi bi-wallet-fill"></i> Price: {{ edx_course['price'] }}</p>
+            <p><i class="bi bi-link-45deg"></i> <a href="{{ edx_course['course_url'] }}">Course URL</a></p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    // Define an array of color combinations
+    const colors = ['#FFB6C1', '#FFDAB9', '#E0FFFF', '#F0E68C', '#FF6347'];
+
+    // Function to apply a random color to the cards
+    function applyColors() {
+      const cards = document.querySelectorAll('.udemy-card, .course-card, .edx-card');
+      cards.forEach(card => {
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        card.style.backgroundColor = randomColor;
+      });
+    }
+
+    // Apply colors when the document is ready
+    document.addEventListener('DOMContentLoaded', applyColors);
+  </script>
+</body>
+</html>

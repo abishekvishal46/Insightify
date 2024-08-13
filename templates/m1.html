@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Design</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            position: relative;
+        }
+        .header {
+            background-color: #d1c4e9;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+            color: #000;
+        }
+        .header h3 {
+            margin: 10px 0 0;
+            font-size: 18px;
+            color: #000;
+        }
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: black;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .timeline-content {
+            padding: 20px;
+            position: relative;
+            background-color: white;
+            width: 45%;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            opacity: 1;
+            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            display: flex;
+            flex-direction: column;
+        }
+        .timeline-content.left {
+            float: left;
+            clear: both;
+            margin-right: 50%;
+            margin-left: 0;
+            border-radius: 6px 6px 6px 0;
+        }
+        .timeline-content.right {
+            float: right;
+            clear: both;
+            margin-left: 50%;
+            margin-right: 0;
+            border-radius: 6px 6px 0 6px;
+        }
+        .timeline-content:hover {
+            transform: perspective(1000px) rotateY(15deg) rotateX(10deg) scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .timeline-content h2 {
+            margin: 0;
+            color: black;
+            font-size: 24px;
+        }
+        .timeline-content p {
+            margin: 10px 0;
+            color: gray;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .timeline-content ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0 0;
+            display: flex; /* Align items horizontally */
+            flex-wrap: wrap; /* Allows wrapping if necessary */
+            gap: 10px; /* Space between the link boxes */
+            align-items: flex-start; /* Align items to the start */
+        }
+        .timeline-content ul li {
+            margin: 0;
+        }
+        .timeline-content .link-box {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .timeline-content.left .link-box {
+            background-color: #f06292; /* Pink */
+        }
+        .timeline-content.right .link-box {
+            background-color: #ffb74d; /* Orange */
+        }
+        .timeline-content.left:nth-child(4) .link-box {
+            background-color: #4db6ac; /* Teal */
+        }
+        .timeline-content.right:nth-child(6) .link-box {
+            background-color: #64b5f6; /* Blue */
+        }
+        .timeline-content.left:nth-child(8) .link-box {
+            background-color: #ba68c8; /* Purple */
+        }
+        .timeline-content .number {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            font-weight: bold;
+            top: 0;
+            font-size: 20px;
+        }
+        .timeline-content.left .number {
+            left: -75px;
+            background-color: #f06292; /* Pink */
+        }
+        .timeline-content.right .number {
+            right: -75px;
+            background-color: #ffb74d; /* Orange */
+        }
+        .timeline-content.left:nth-child(4) .number {
+            background-color: #4db6ac; /* Teal */
+        }
+        .timeline-content.right:nth-child(6) .number {
+            background-color: #64b5f6; /* Blue */
+        }
+        .timeline-content.left:nth-child(8) .number {
+            background-color: #ba68c8; /* Purple */
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d1c4e9;
+            border-radius: 10px;
+        }
+        .footer h3 {
+            margin: 0;
+            font-size: 18px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TIMELINE</h1>
+            <h3>How to achieve the best design</h3>
+        </div>
+        <div class="timeline">
+            {% for step, details in roadmap.items() %}
+                <div class="timeline-content {{ 'left' if loop.index % 2 != 0 else 'right' }}">
+                    <div class="number">{{ loop.index }}</div>
+                    <div class="text-content">
+                        <h2>{{ step }}</h2>
+                        <p>{{ details.description }}</p>
+                        <ul>
+                            {% for resource in details.resources %}
+                                <li><a href="{{ resource.values() | list | first }}" class="link-box" target="_blank">{{ resource.keys() | list | first }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="footer">
+            <h3>How to create beautiful layouts with jinja2</h3>
+        </div>
+    </div>
+</body>
+</html>

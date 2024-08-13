@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advantages and Disadvantages</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../static/assets/css/proscons.css">
+    <link rel="stylesheet" href="https://github.hubspot.com/odometer/themes/odometer-theme-minimal.css" />
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            font-family: "Roboto", sans-serif;
+        }
+
+        .odometer-wrapper {
+            display: flex;
+            align-items: center;
+            font-size: 100px;
+            color: #000;
+            margin-top: 20px;
+        }
+
+        .odometer-symbol {
+            font-size: 100px;
+            margin-left: 10px;
+        }
+
+        .description {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            margin-top: 20px;
+            max-width: 800px;
+        }
+
+        .card1 {
+          width: 1300px;
+          height: 300px;
+          padding: 20px;
+          background: #fff;
+          border: 6px solid #000;
+          box-shadow: 12px 12px 0 #000;
+          transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card1:hover {
+          transform: translate(-5px, -5px);
+          box-shadow: 17px 17px 0 #000;
+        }
+
+        .card1__title {
+          font-size: 32px;
+          font-weight: 900;
+          color: #000;
+          text-transform: uppercase;
+          margin-bottom: 15px;
+          display: block;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .card1__title::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 90%;
+          height: 3px;
+          background-color: #000;
+          transform: translateX(-100%);
+          transition: transform 0.3s;
+        }
+
+        .card1:hover .card1__title::after {
+          transform: translateX(0);
+        }
+
+        .card1__content {
+          font-size: 16px;
+          line-height: 1.4;
+          color: #000;
+          margin-bottom: 20px;
+        }
+
+        .card__form {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        @keyframes glitch {
+          0% {
+            transform: translate(2px, 2px);
+          }
+          25% {
+            transform: translate(-2px, -2px);
+          }
+          50% {
+            transform: translate(-2px, 2px);
+          }
+          75% {
+            transform: translate(2px, -2px);
+          }
+          100% {
+            transform: translate(2px, 2px);
+          }
+        }
+
+        .glitch {
+          animation: glitch 0.3s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="description">
+    <!-- Add any description if needed -->
+</div>
+<div class="odometer-wrapper" style="">
+    <h1 class="heading" style="margin-right:30px;margin-top:200px;">Your Resume Score is </h1>
+    <div class="odometer" id="odometer" style="margin-top:200px;">00.00</div>
+    <div class="odometer-symbol" style="margin-top:200px">%</div>
+</div>
+<div class="card1">
+  <span class="card1__title">Jobs you can apply</span>
+    <ul>
+        {% for job in jobs %}
+        <li>{{ job }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="row">
+    <div class="container">
+        <h1>Pros</h1>
+        <div class="card">
+            <ul>
+                {% for pro in pros %}
+                <li style="font-family: 'Montserrat', sans-serif;">
+                    <i class="bi bi-check-circle text-success"></i> {{ pro }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Cons</h1>
+        <div class="card">
+            <ul>
+                {% for con in cons %}
+                <li>
+                    <i class="bi bi-x-circle text-danger"></i> {{ con }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.js"></script>
+<script src="https://github.hubspot.com/odometer/odometer.js"></script>
+<script>
+    // Get the score from the backend
+    const score = {{ score|tojson }};
+
+    // Initialize Odometer
+    const od = new Odometer({
+        el: document.getElementById("odometer"),
+        format: "(,ddd).dd",
+        duration: 3000,
+        theme: "minimal"
+    });
+    od.render();
+
+    // Start animation with backend score
+    setTimeout(function () {
+        od.update(score);
+    }, 100);
+</script>
+</body>
+</html>
