@@ -4,9 +4,9 @@ import pandas as pd
 import re
 
 
-data = pd.read_csv("./course datasets/Udemy_final_dataset.csv")
-data_coursera = pd.read_csv("./course datasets/data_coursera_updated.csv")
-data_edx = pd.read_csv("./course datasets/edx_courses.csv")
+data = pd.read_csv("./course datasets/cleaned_udemy.csv")
+data_coursera = pd.read_csv("./course datasets/cleaned_coursera.csv")
+data_edx = pd.read_csv("./course datasets/cleaned_edx.csv")
 
 def clean_numeric_strings(value):
     if isinstance(value, str):
@@ -15,27 +15,21 @@ def clean_numeric_strings(value):
         cleaned_value = str(value)
     return cleaned_value if cleaned_value else '0'
 
-data['rating'] = pd.to_numeric(data['rating'], errors='coerce').fillna(0).astype(int)
-data_coursera['features'] = data_coursera['course'] + ' ' + data_coursera['reviewcount'].astype(str) + ' ' + \
-                            data_coursera['level']
-data_coursera['features'] = data_coursera['features'].fillna('')
-vectorizer_coursera = TfidfVectorizer(stop_words='english')
-feature_matrix_coursera = vectorizer_coursera.fit_transform(data_coursera['features'])
+
 
 # Preprocess edX data
-text_features = ['title', 'summary', 'instructors', 'Level', 'price', 'course_url']
-data_edx['combined_text'] = data_edx[text_features].astype(str).apply(lambda x: ' '.join(x), axis=1)
-vectorizer_edx = TfidfVectorizer(stop_words='english')
-feature_matrix_edx = vectorizer_edx.fit_transform(data_edx['combined_text'])
+
 
 # Process Udemy recommendations
-tfidf_vectorizer = TfidfVectorizer(stop_words='english')
-data['description'] = data['description'].fillna('')
-tfidf_matrix = tfidf_vectorizer.fit_transform(data['description'])
-cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
 
 
 def get_udemy_recommendations(title, min_rating=0):
+    tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+    data['description'] = data['description'].fillna('')
+    tfidf_matrix = tfidf_vectorizer.fit_transform(data['description'])
+    cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
     matches = data[data['title'].str.contains(title, case=False)]
     if not matches.empty:
         idx1 = matches.index[0]
@@ -64,6 +58,9 @@ def get_udemy_recommendations(title, min_rating=0):
 
 
 def get_coursera_recommendations(title, min_rating=0, top_n=10):
+    data_coursera['features'] = data_coursera['features'].fillna('')
+    vectorizer_coursera = TfidfVectorizer(stop_words='english')
+    feature_matrix_coursera = vectorizer_coursera.fit_transform(data_coursera['features'])
     # Convert the input title into a feature vector
     input_features_vector = vectorizer_coursera.transform([title])
 
@@ -91,6 +88,10 @@ def get_coursera_recommendations(title, min_rating=0, top_n=10):
 # Process edX recommendations
 
 def get_edx_recommendations(title, top_n=10):
+    text_features = ['title', 'summary', 'instructors', 'Level', 'price', 'course_url']
+    data_edx['combined_text'] = data_edx[text_features].astype(str).apply(lambda x: ' '.join(x), axis=1)
+    vectorizer_edx = TfidfVectorizer(stop_words='english')
+    feature_matrix_edx = vectorizer_edx.fit_transform(data_edx['combined_text'])
     # Convert the input title into a feature vector
     input_features_edx_vector = vectorizer_edx.transform([title])
 
@@ -104,3 +105,5 @@ def get_edx_recommendations(title, top_n=10):
     top_edx = data_edx.iloc[similar_indices_edx.flatten()]
 
     return top_edx
+a =get_udemy_recommendations('python')
+print(a)
