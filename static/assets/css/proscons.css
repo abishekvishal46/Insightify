@@ -1,0 +1,128 @@
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            flex-direction: column;
+        }
+
+        .row {
+            display: flex;
+            gap: 60px; /* Space between the cards */
+        }
+
+        .container {
+            width: 600px;
+            height: 500px;
+            background: transparent;
+            position: relative;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.438);
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .card {
+            cursor: default;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: #212121;
+            background-color: rgba(255, 255, 255, 0.074);
+            border: 1px solid rgba(255, 255, 255, 0.222);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 10px;
+            transition: all ease 0.3s;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto; /* Allows scrolling if content overflows */
+        }
+
+        .card h5 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 20px;
+            overflow-y: auto; /* Allows vertical scrolling if content overflows */
+            max-height: 400px; /* Limits the height of the list */
+        }
+
+        .card li {
+            margin-bottom: 10px;
+            word-wrap: break-word; /* Breaks long words to fit inside the card */
+            text-overflow: ellipsis; /* Adds ellipsis for overflowing text */
+            overflow: hidden; /* Hides overflow text */
+        }
+
+        .container::after,
+        .container::before {
+            width: 150px;
+            height: 150px;
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            transition: 0.5s linear;
+        }
+
+        /* First Card Colors */
+        .container:first-child::after {
+            top: -30px;
+            left: -30px;
+            background-color: rgba(125, 214, 66, 0.603);
+            animation: animFirst 5s linear infinite;
+        }
+
+        .container:first-child::before {
+            background-color: #D4CD5C;
+            top: 75%;
+            left: 80%;
+            animation: animSecond 5s linear infinite;
+            animation-delay: 3s;
+        }
+
+        /* Second Card Colors */
+        .container:last-child::after {
+            top: -30px;
+            left: -30px;
+            background-color:  rgba(250,  128, 114, 0.603);/* Different color */
+            animation: animFirst 5s linear infinite;
+        }
+
+        .container:last-child::before {
+            background-color: #577f8a; /* Different color */
+            top: 75%;
+            left: 80%;
+            animation: animSecond 5s linear infinite;
+            animation-delay: 3s;
+        }
+
+        .container:hover {
+            box-shadow: 0px 0px 10px rgba(0, 77, 32, 0.432);
+        }
+
+        .container:hover::after {
+            left: calc(100% - 150px);
+            transform: scale(5.2);
+        }
+
+        .container:hover::before {
+            left: -20px;
+            transform: scale(1.5);
+        }
