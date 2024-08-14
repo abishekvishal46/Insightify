@@ -1,78 +1,72 @@
 import pandas as pd
 import re
 import numpy as np
-import faiss
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+import pickle
 # Load datasets
 data = pd.read_csv("./course datasets/cleaned_udemy.csv")
 data_coursera = pd.read_csv("./course datasets/cleaned_coursera.csv")
 data_edx = pd.read_csv("./course datasets/cleaned_edx.csv")
 
-def clean_numeric_strings(value):
-    if isinstance(value, str):
-        cleaned_value = re.sub(r'[^\d.]', '', value)
-    else:
-        cleaned_value = str(value)
-    return cleaned_value if cleaned_value else '0'
+# Load preprocessed data and vectorizers
+with open('tfidf_matrix_udemy.pkl', 'rb') as f:
+    tfidf_matrix_udemy, tfidf_vectorizer_udemy = pickle.load(f)
 
-# Preprocess data
-data['description'] = data['description'].fillna('')
-data_coursera['features'] = data_coursera['features'].fillna('')
-text_features = ['title', 'summary', 'instructors', 'Level', 'price', 'course_url']
-data_edx['combined_text'] = data_edx[text_features].astype(str).apply(lambda x: ' '.join(x), axis=1)
+with open('feature_matrix_coursera.pkl', 'rb') as f:
+    feature_matrix_coursera, vectorizer_coursera = pickle.load(f)
 
-# TF-IDF Vectorization
-tfidf_vectorizer = TfidfVectorizer(stop_words='english')
-tfidf_matrix_udemy = tfidf_vectorizer.fit_transform(data['description'])
-tfidf_matrix_coursera = tfidf_vectorizer.fit_transform(data_coursera['features'])
-tfidf_matrix_edx = tfidf_vectorizer.fit_transform(data_edx['combined_text'])
+with open('feature_matrix_edx.pkl', 'rb') as f:
+    feature_matrix_edx, vectorizer_edx = pickle.load(f)
 
-# FAISS Index Creation
-def create_faiss_index(tfidf_matrix):
-    index = faiss.IndexFlatL2(tfidf_matrix.shape[1])
-    faiss_index = faiss.IndexIDMap(index)
-    faiss_index.add_with_ids(tfidf_matrix.toarray(), np.array(range(0, tfidf_matrix.shape[0])))
-    return faiss_index
+# You can now use these loaded objects in your recommendation functions
 
-faiss_index_udemy = create_faiss_index(tfidf_matrix_udemy)
-faiss_index_coursera = create_faiss_index(tfidf_matrix_coursera)
-faiss_index_edx = create_faiss_index(tfidf_matrix_edx)
 
-# Recommendation Functions
-def get_faiss_recommendations(title, faiss_index, tfidf_matrix, data, top_n=10, min_rating=0):
+def get_udemy_recommendations(title, min_rating=0):
+    # Use the loaded tfidf_matrix_udemy and tfidf_vectorizer_udemy
     matches = data[data['title'].str.contains(title, case=False)]
     if not matches.empty:
         idx1 = matches.index[0]
-        D, I = faiss_index.search(tfidf_matrix[idx1:idx1+1].toarray(), top_n)
-        recommended_courses = data.iloc[I.flatten()]
+        sim_scores = list(enumerate(cosine_similarity(tfidf_matrix_udemy[idx1], tfidf_matrix_udemy)[0]))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        sim_scores = sim_scores[1:11]
+        course_indices = [score[0] for score in sim_scores]
+        recommended_courses = data.iloc[course_indices]
+
+        if 'description' in recommended_courses.columns:
+            recommended_courses = recommended_courses[
+                recommended_courses['description'].notna() &
+                recommended_courses['description'].str.contains(title, case=False)
+            ]
 
         if 'rating' in recommended_courses.columns:
-            recommended_courses = recommended_courses[recommended_courses['rating'].notna()]
-            recommended_courses['rating'] = pd.to_numeric(recommended_courses['rating'], errors='coerce')
             recommended_courses = recommended_courses[recommended_courses['rating'] >= min_rating]
-
-        return recommended_courses
     else:
-        return None
+        recommended_courses = None
 
-def get_udemy_recommendations(title, min_rating=0, top_n=10):
-    return get_faiss_recommendations(title, faiss_index_udemy, tfidf_matrix_udemy, data, top_n, min_rating)
+    return recommended_courses
+
 
 def get_coursera_recommendations(title, min_rating=0, top_n=10):
-    return get_faiss_recommendations(title, faiss_index_coursera, tfidf_matrix_coursera, data_coursera, top_n, min_rating)
+    input_features_vector = vectorizer_coursera.transform([title])
+    similarity_scores = cosine_similarity(feature_matrix_coursera, input_features_vector)
+    similar_indices = similarity_scores.argsort(axis=0)[-top_n - 1:-1][::-1]
+    top_recommendations = data_coursera.iloc[similar_indices.flatten()]
+
+    if 'rating' in top_recommendations.columns:
+        top_recommendations = top_recommendations[top_recommendations['rating'].notna()]
+        top_recommendations['rating'] = pd.to_numeric(top_recommendations['rating'], errors='coerce')
+        top_recommendations = top_recommendations[top_recommendations['rating'] >= min_rating]
+        top_recommendations = top_recommendations.sort_values(by='rating', ascending=False)
+
+    return top_recommendations
+
 
 def get_edx_recommendations(title, top_n=10):
-    return get_faiss_recommendations(title, faiss_index_edx, tfidf_matrix_edx, data_edx, top_n)
+    input_features_edx_vector = vectorizer_edx.transform([title])
+    similarity_scores_edx = cosine_similarity(feature_matrix_edx, input_features_edx_vector)
+    similar_indices_edx = similarity_scores_edx.argsort(axis=0)[-top_n - 1:-1][::-1]
+    top_edx = data_edx.iloc[similar_indices_edx.flatten()]
 
-# Example Usage
-title = "C#"
-print("Udemy Recommendations:")
-print(get_udemy_recommendations(title))
-
-print("Coursera Recommendations:")
-print(get_coursera_recommendations(title))
-
-print("edX Recommendations:")
-print(get_edx_recommendations(title))
+    return top_edx
